@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Wand2,
   Sparkles,
@@ -42,6 +42,12 @@ export const VideoStudio: React.FC<VideoStudioProps> = ({
   const [duration, setDuration] = useState<number>(5);
   const [fps, setFps] = useState<number>(30);
   const [seed, setSeed] = useState<number>(89432109);
+
+  useEffect(() => {
+    if (activePrompt) {
+      setPrompt(activePrompt);
+    }
+  }, [activePrompt]);
 
 
 

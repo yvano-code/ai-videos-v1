@@ -30,9 +30,12 @@ export const VideoCanvas: React.FC<VideoCanvasProps> = ({ video, onRemix }) => {
   useEffect(() => {
     if (videoRef.current) {
       videoRef.current.currentTime = 0;
-      setIsPlaying(false);
+      videoRef.current
+        .play()
+        .then(() => setIsPlaying(true))
+        .catch(() => setIsPlaying(false));
     }
-  }, [video?.id]);
+  }, [video?.id, video?.videoUrl]);
 
   if (!video) {
     return (
@@ -156,8 +159,20 @@ export const VideoCanvas: React.FC<VideoCanvasProps> = ({ video, onRemix }) => {
           poster={video.thumbnailUrl}
           loop
           muted={isMuted}
+          playsInline
+          autoPlay
           onTimeUpdate={handleTimeUpdate}
           onEnded={() => setIsPlaying(false)}
+          onPlay={() => setIsPlaying(true)}
+          onPause={() => setIsPlaying(false)}
+          onError={(e) => {
+            // Fallback video URL if current link has loading issues
+            const target = e.currentTarget;
+            if (!target.src.includes('BigBuckBunny')) {
+              target.src = 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4';
+              target.play().catch(() => {});
+            }
+          }}
           onClick={togglePlay}
           style={{
             width: '100%',

@@ -43,7 +43,7 @@ export const VideoStudio: React.FC<VideoStudioProps> = ({
   const [fps, setFps] = useState<number>(30);
   const [seed, setSeed] = useState<number>(89432109);
 
-  const currentModelData = AI_MODELS.find((m) => m.id === selectedModel) || AI_MODELS[0];
+
 
   const handleMagicEnhance = () => {
     const styleObj = STYLE_PRESETS.find((s) => s.id === selectedStyle);
@@ -175,7 +175,7 @@ export const VideoStudio: React.FC<VideoStudioProps> = ({
                     </span>
                   </div>
                   <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
-                    {m.provider} • {m.cost} Credits
+                    {m.provider} • Free
                   </div>
                 </div>
               );
@@ -360,7 +360,7 @@ export const VideoStudio: React.FC<VideoStudioProps> = ({
           ) : (
             <>
               <Zap size={20} />
-              Generate AI Video ({currentModelData.cost} Credits)
+              Generate AI Video (Free / Unlimited)
             </>
           )}
         </button>

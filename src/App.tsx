@@ -11,7 +11,7 @@ export function App() {
   const [activeTab, setActiveTab] = useState<'studio' | 'queue' | 'gallery'>('studio');
   const [videos, setVideos] = useState<VideoItem[]>(MOCK_VIDEOS);
   const [selectedVideo, setSelectedVideo] = useState<VideoItem | null>(MOCK_VIDEOS[0]);
-  const [credits, setCredits] = useState<number>(480);
+  const [credits] = useState<number>(999999);
   const [activePromptForStudio, setActivePromptForStudio] = useState<string>('');
 
   // Queue of active render jobs
@@ -87,12 +87,7 @@ export function App() {
     fps: number;
     seed: number;
   }) => {
-    if (credits < 15) {
-      showToast('⚠️ Insufficient GPU credits!');
-      return;
-    }
-
-    setCredits((prev) => prev - 15);
+    // Unlimited generations - no credit restriction!
 
     const newJob: RenderJob = {
       id: `job-${Date.now()}`,

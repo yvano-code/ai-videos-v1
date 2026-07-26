@@ -13,7 +13,7 @@ export const Header: React.FC<HeaderProps> = ({
   activeTab,
   setActiveTab,
   activeQueueCount,
-  credits,
+  credits: _credits,
   onNewProject
 }) => {
   return (
@@ -132,15 +132,15 @@ export const Header: React.FC<HeaderProps> = ({
           display: 'flex',
           alignItems: 'center',
           gap: '8px',
-          padding: '6px 12px',
+          padding: '6px 14px',
           borderRadius: 'var(--radius-md)',
-          background: 'rgba(99, 102, 241, 0.1)',
-          border: '1px solid rgba(99, 102, 241, 0.25)',
+          background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(99, 102, 241, 0.15))',
+          border: '1px solid rgba(16, 185, 129, 0.35)',
           fontSize: '0.82rem'
         }}>
-          <Cpu size={16} color="#818cf8" />
-          <span style={{ color: 'var(--text-secondary)' }}>GPU Credits:</span>
-          <span style={{ fontWeight: 700, color: '#fff' }}>{credits}</span>
+          <Cpu size={16} color="#34d399" />
+          <span style={{ color: 'var(--text-secondary)' }}>GPU Access:</span>
+          <span style={{ fontWeight: 800, color: '#34d399', letterSpacing: '0.5px' }}>∞ Unlimited</span>
         </div>
 
         <button className="btn btn-primary" onClick={onNewProject} style={{ padding: '8px 16px', fontSize: '0.85rem' }}>

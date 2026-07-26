@@ -120,7 +120,7 @@ export function App() {
       resolution: '4K',
       cameraMotion: jobData.cameraMotion,
       seed: jobData.seed,
-      videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-futuristic-city-with-neon-lights-and-flying-vehicles-42934-large.mp4',
+      videoUrl: MOCK_VIDEOS[Math.floor(Math.random() * MOCK_VIDEOS.length)].videoUrl,
       thumbnailUrl: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1200&q=80',
       tags: [jobData.style, '4K', jobData.aspectRatio],
       createdAt: 'Just now',

@@ -91,6 +91,23 @@ export const VideoCanvas: React.FC<VideoCanvasProps> = ({ video, onRemix }) => {
     setTimeout(() => setIsCopied(false), 2000);
   };
 
+  const handleExport = async () => {
+    try {
+      const response = await fetch(video.videoUrl);
+      const blob = await response.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = `${video.title.toLowerCase().replace(/[^a-z0-9]/g, '-')}.mp4`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(blobUrl);
+    } catch {
+      window.open(video.videoUrl, '_blank');
+    }
+  };
+
   return (
     <div className="glass-panel" style={{
       display: 'flex',
@@ -284,17 +301,14 @@ export const VideoCanvas: React.FC<VideoCanvasProps> = ({ video, onRemix }) => {
               Remix Prompt
             </button>
 
-            <a
-              href={video.videoUrl}
-              download
-              target="_blank"
-              rel="noreferrer"
+            <button
+              onClick={handleExport}
               className="btn btn-primary"
-              style={{ fontSize: '0.8rem', padding: '6px 14px', textDecoration: 'none' }}
+              style={{ fontSize: '0.8rem', padding: '6px 14px' }}
             >
               <Download size={14} />
               Export MP4
-            </a>
+            </button>
           </div>
         </div>
       </div>

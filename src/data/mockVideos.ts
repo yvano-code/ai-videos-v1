@@ -183,9 +183,10 @@ export const CAMERA_MOTIONS = [
 ];
 
 export const AI_MODELS = [
-  { id: 'Sora v2', name: 'Sora v2', provider: 'OpenAI', speed: 'Fast (15s)', quality: 'Ultra 8K', cost: 15 },
-  { id: 'Runway Gen-3 Alpha', name: 'Runway Gen-3', provider: 'Runway', speed: 'Ultra Fast (8s)', quality: 'Cinematic', cost: 12 },
-  { id: 'Luma Dream Machine', name: 'Dream Machine', provider: 'Luma AI', speed: 'Normal (20s)', quality: 'Photoreal Physics', cost: 10 },
-  { id: 'Flux Video', name: 'Flux Video v1', provider: 'Black Forest Labs', speed: 'Fast (12s)', quality: 'High Fidelity', cost: 10 },
-  { id: 'Pika 2.0', name: 'Pika 2.0', provider: 'Pika Labs', speed: 'Instant (5s)', quality: 'Anime & Motion', cost: 8 },
+  { id: 'HunyuanVideo SOTA', name: 'Hunyuan SOTA', provider: 'Tencent Open-Source', speed: '12s (Fast)', quality: 'SOTA 1080p', cost: '~$0.05' },
+  { id: 'Wan2.1', name: 'Wan2.1', provider: 'Alibaba Open-Source', speed: '10s (Fast)', quality: 'Cinematic Motion', cost: '~$0.05' },
+  { id: 'Kling 1.5 Pro', name: 'Kling 1.5 Pro', provider: 'Kuaishou AI', speed: '15s', quality: 'Facial Emotion & Realism', cost: '~$0.12' },
+  { id: 'Luma Ray 2', name: 'Dream Machine', provider: 'Luma AI', speed: '18s', quality: 'Photoreal Physics', cost: '~$0.18' },
+  { id: 'LTX-Video', name: 'LTX-Video', provider: 'Lightricks Open-Source', speed: '4s (Ultra Fast)', quality: 'Budget Fast Draft', cost: '~$0.02' },
+  { id: 'Sora v2 Pro', name: 'Sora v2 Pro', provider: 'OpenAI', speed: '15s', quality: 'Ultra 8K Multi-Shot', cost: '~$0.20' },
 ];

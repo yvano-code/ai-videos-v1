@@ -4,6 +4,7 @@ import { VideoStudio } from './components/VideoStudio';
 import { VideoCanvas } from './components/VideoCanvas';
 import { GenerationQueue } from './components/GenerationQueue';
 import { VideoGallery } from './components/VideoGallery';
+import { ApiSettingsModal } from './components/ApiSettingsModal';
 import { MOCK_VIDEOS, type VideoItem, type RenderJob } from './data/mockVideos';
 import { Sparkles } from 'lucide-react';
 
@@ -13,6 +14,8 @@ export function App() {
   const [selectedVideo, setSelectedVideo] = useState<VideoItem | null>(MOCK_VIDEOS[0]);
   const [credits] = useState<number>(999999);
   const [activePromptForStudio, setActivePromptForStudio] = useState<string>('');
+  const [apiKey, setApiKey] = useState<string>(() => localStorage.getItem('AI_VIDEO_API_KEY') || '');
+  const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
 
   // Queue of active render jobs
   const [renderJobs, setRenderJobs] = useState<RenderJob[]>([
@@ -156,6 +159,16 @@ export function App() {
     showToast('✨ Prompt copied to Studio!');
   };
 
+  const handleSaveApiKey = (key: string) => {
+    setApiKey(key);
+    localStorage.setItem('AI_VIDEO_API_KEY', key);
+    if (key) {
+      showToast('🔑 Fal.ai / Replicate API Key connected!');
+    } else {
+      showToast('API Key disconnected.');
+    }
+  };
+
   return (
     <div className="app-container">
       <Header
@@ -167,6 +180,15 @@ export function App() {
           setActiveTab('studio');
           setActivePromptForStudio('');
         }}
+        onOpenSettings={() => setIsSettingsOpen(true)}
+        hasApiKey={!!apiKey}
+      />
+
+      <ApiSettingsModal
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+        onSaveKey={handleSaveApiKey}
+        currentKey={apiKey}
       />
 
       {/* Notification Toast */}

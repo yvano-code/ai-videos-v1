@@ -9,7 +9,8 @@ import {
   Sparkles,
   Check,
   Film,
-  Activity
+  Activity,
+  Wand2
 } from 'lucide-react';
 import type { VideoItem } from '../data/mockVideos';
 
@@ -25,6 +26,7 @@ export const VideoCanvas: React.FC<VideoCanvasProps> = ({ video, onRemix }) => {
   const [duration, setDuration] = useState(5);
   const [isMuted, setIsMuted] = useState(true);
   const [isCopied, setIsCopied] = useState(false);
+  const [isUpscaling, setIsUpscaling] = useState(false);
   const [activeResolution, setActiveResolution] = useState<'720p' | '1080p' | '4K'>('4K');
 
   useEffect(() => {
@@ -290,6 +292,20 @@ export const VideoCanvas: React.FC<VideoCanvasProps> = ({ video, onRemix }) => {
             <button className="btn btn-secondary" onClick={handleCopyPrompt} style={{ fontSize: '0.8rem', padding: '6px 12px' }}>
               {isCopied ? <Check size={14} color="#10b981" /> : <Copy size={14} />}
               {isCopied ? 'Copied Prompt' : 'Copy Prompt'}
+            </button>
+            <button
+              className="btn btn-accent"
+              onClick={() => {
+                setIsUpscaling(true);
+                setTimeout(() => {
+                  setIsUpscaling(false);
+                  setActiveResolution('4K');
+                }, 2000);
+              }}
+              style={{ fontSize: '0.8rem', padding: '6px 12px' }}
+            >
+              <Wand2 size={14} color="#34d399" />
+              {isUpscaling ? 'Enhancing to 4K...' : '4K AI Upscale'}
             </button>
 
             <button

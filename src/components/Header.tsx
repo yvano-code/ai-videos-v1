@@ -1,5 +1,5 @@
 import React from 'react';
-import { Video, Sparkles, Layers, Cpu, Plus, Compass } from 'lucide-react';
+import { Video, Sparkles, Layers, Cpu, Plus, Compass, Key } from 'lucide-react';
 
 interface HeaderProps {
   activeTab: 'studio' | 'queue' | 'gallery';
@@ -7,6 +7,8 @@ interface HeaderProps {
   activeQueueCount: number;
   credits: number;
   onNewProject: () => void;
+  onOpenSettings: () => void;
+  hasApiKey: boolean;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -14,7 +16,9 @@ export const Header: React.FC<HeaderProps> = ({
   setActiveTab,
   activeQueueCount,
   credits: _credits,
-  onNewProject
+  onNewProject,
+  onOpenSettings,
+  hasApiKey
 }) => {
   return (
     <header style={{
@@ -50,7 +54,7 @@ export const Header: React.FC<HeaderProps> = ({
               AI Videos
             </span>
             <span className="badge badge-indigo" style={{ fontSize: '0.65rem', padding: '2px 6px' }}>
-              v1.0
+              v1.0 Pro
             </span>
           </div>
           <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
@@ -126,8 +130,22 @@ export const Header: React.FC<HeaderProps> = ({
         </button>
       </nav>
 
-      {/* Right Controls: GPU Credits & Action */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+      {/* Right Controls: API Settings & GPU Access */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <button
+          className="btn btn-secondary"
+          onClick={onOpenSettings}
+          style={{
+            padding: '6px 12px',
+            fontSize: '0.8rem',
+            borderColor: hasApiKey ? '#10b981' : 'var(--border-light)',
+            color: hasApiKey ? '#34d399' : 'var(--text-secondary)'
+          }}
+        >
+          <Key size={14} color={hasApiKey ? '#34d399' : '#818cf8'} />
+          {hasApiKey ? 'API Connected' : 'Connect API Key'}
+        </button>
+
         <div style={{
           display: 'flex',
           alignItems: 'center',

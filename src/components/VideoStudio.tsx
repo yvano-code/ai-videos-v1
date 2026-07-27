@@ -4,7 +4,9 @@ import {
   Sparkles,
   Zap,
   RotateCcw,
-  EyeOff
+  EyeOff,
+  Image as ImageIcon,
+  Music
 } from 'lucide-react';
 import { AI_MODELS, STYLE_PRESETS, CAMERA_MOTIONS } from '../data/mockVideos';
 
@@ -42,6 +44,12 @@ export const VideoStudio: React.FC<VideoStudioProps> = ({
   const [duration, setDuration] = useState<number>(5);
   const [fps, setFps] = useState<number>(30);
   const [seed, setSeed] = useState<number>(89432109);
+
+  // Enterprise features
+  const [imageUrl, setImageUrl] = useState('');
+  const [showImageInput, setShowImageInput] = useState(false);
+  const [enableAudioSFX, setEnableAudioSFX] = useState(true);
+  const [characterAnchor, setCharacterAnchor] = useState('');
 
   useEffect(() => {
     if (activePrompt) {
@@ -343,6 +351,62 @@ export const VideoStudio: React.FC<VideoStudioProps> = ({
           >
             <RotateCcw size={16} />
           </button>
+        </div>
+
+        {/* Enterprise Pro Toggles */}
+        <div style={{ background: 'rgba(255, 255, 255, 0.02)', border: '1px solid var(--border-light)', borderRadius: 'var(--radius-md)', padding: '14px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#a5b4fc', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <ImageIcon size={16} color="#818cf8" />
+              Image-to-Video Start Frame
+            </span>
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={() => setShowImageInput(!showImageInput)}
+              style={{ padding: '4px 10px', fontSize: '0.75rem' }}
+            >
+              {showImageInput ? 'Hide' : '+ Add Image URL'}
+            </button>
+          </div>
+
+          {showImageInput && (
+            <input
+              type="text"
+              className="form-input"
+              value={imageUrl}
+              onChange={(e) => setImageUrl(e.target.value)}
+              placeholder="Paste starting keyframe image URL (e.g. https://...)"
+              style={{ fontSize: '0.82rem' }}
+            />
+          )}
+
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid var(--border-light)', paddingTop: '10px' }}>
+            <span style={{ fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <Music size={15} color="#ec4899" />
+              Auto AI Cinematic Audio & SFX
+            </span>
+            <input
+              type="checkbox"
+              checked={enableAudioSFX}
+              onChange={(e) => setEnableAudioSFX(e.target.checked)}
+              style={{ width: '16px', height: '16px', accentColor: 'var(--accent-indigo)', cursor: 'pointer' }}
+            />
+          </div>
+
+          <div style={{ borderTop: '1px solid var(--border-light)', paddingTop: '10px' }}>
+            <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '4px' }}>
+              Character Face Anchor Tag (Consistency)
+            </label>
+            <input
+              type="text"
+              className="form-input"
+              value={characterAnchor}
+              onChange={(e) => setCharacterAnchor(e.target.value)}
+              placeholder="e.g. character_id: man_motel_actor_01"
+              style={{ fontSize: '0.82rem' }}
+            />
+          </div>
         </div>
 
         {/* Submit Generation Button */}

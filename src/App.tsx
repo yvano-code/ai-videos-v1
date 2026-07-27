@@ -5,7 +5,7 @@ import { VideoCanvas } from './components/VideoCanvas';
 import { GenerationQueue } from './components/GenerationQueue';
 import { VideoGallery } from './components/VideoGallery';
 import { ApiSettingsModal } from './components/ApiSettingsModal';
-import { MOCK_VIDEOS, type VideoItem, type RenderJob } from './data/mockVideos';
+import { MOCK_VIDEOS, AI_MODELS, type VideoItem, type RenderJob } from './data/mockVideos';
 import { Sparkles } from 'lucide-react';
 
 export function App() {
@@ -91,7 +91,19 @@ export function App() {
     return () => clearInterval(timer);
   }, []);
 
-  const handleGenerate = (jobData: {
+  const [totalSpent, setTotalSpent] = useState<number>(() => {
+    return Number(localStorage.getItem('AI_VIDEO_TOTAL_SPENT')) || 0;
+  });
+
+  const updateSpend = (cost: number) => {
+    setTotalSpent((prev) => {
+      const updated = prev + cost;
+      localStorage.setItem('AI_VIDEO_TOTAL_SPENT', updated.toString());
+      return updated;
+    });
+  };
+
+  const handleGenerate = async (jobData: {
     prompt: string;
     negativePrompt: string;
     model: string;
@@ -102,10 +114,14 @@ export function App() {
     fps: number;
     seed: number;
   }) => {
-    // Unlimited generations - no credit restriction!
+    // Model price tracking
+    const modelObj = AI_MODELS.find((m) => m.id === jobData.model);
+    const cost = modelObj?.priceNum || 0.05;
+    updateSpend(cost);
 
+    const newJobId = `job-${Date.now()}`;
     const newJob: RenderJob = {
-      id: `job-${Date.now()}`,
+      id: newJobId,
       title: jobData.prompt.slice(0, 30) + '...',
       prompt: jobData.prompt,
       model: jobData.model,
@@ -114,14 +130,73 @@ export function App() {
       duration: jobData.duration,
       progress: 10,
       status: 'processing',
-      currentStage: 'Parsing Prompt & Model Embeddings...',
+      currentStage: apiKey ? 'Submitting to Fal.ai Hunyuan API...' : 'Parsing Prompt & Model Embeddings...',
       estimatedTimeLeft: 12,
       createdAt: 'Just now'
     };
 
     setRenderJobs((prev) => [newJob, ...prev]);
 
-    // Also insert into video gallery preview once complete
+    // Check if live Fal API key is connected
+    if (apiKey) {
+      showToast(`⚡ Submitting to Fal.ai (${jobData.model}) — Cost: $${cost.toFixed(3)}`);
+      try {
+        const endpoint = modelObj?.endpoint || 'fal-ai/hunyuan-video';
+        const res = await fetch(`https://fal.run/${endpoint}`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Key ${apiKey}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            prompt: jobData.prompt,
+            aspect_ratio: jobData.aspectRatio,
+            duration: jobData.duration
+          })
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          const videoUrl = data?.video?.url || data?.video_url;
+          if (videoUrl) {
+            const liveVid: VideoItem = {
+              id: `vid-${Date.now()}`,
+              title: jobData.prompt.slice(0, 35) + '...',
+              prompt: jobData.prompt,
+              negativePrompt: jobData.negativePrompt,
+              model: jobData.model,
+              style: jobData.style,
+              cameraMotion: jobData.cameraMotion,
+              videoUrl: videoUrl,
+              thumbnailUrl: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=800&auto=format&fit=crop&q=80',
+              duration: jobData.duration,
+              aspectRatio: jobData.aspectRatio,
+              fps: jobData.fps,
+              seed: jobData.seed,
+              resolution: '1080p',
+              tags: [jobData.style, 'GOOD YUTE', jobData.aspectRatio],
+              likes: 1,
+              views: 1,
+              creator: {
+                name: 'GOOD YUTE Creator',
+                avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80'
+              },
+              createdAt: 'Just now'
+            };
+            setVideos((prev) => [liveVid, ...prev]);
+            setSelectedVideo(liveVid);
+            showToast('🎉 Live Fal.ai HunyuanVideo Rendered Successfully!');
+            return;
+          }
+        }
+      } catch (err) {
+        console.warn('Fal API call fallback to preview studio:', err);
+      }
+    } else {
+      showToast(`🚀 Render Started ($${cost.toFixed(3)} added to spend meter). Connect API key in top right to go live!`);
+    }
+
+    // Default studio preview fallback item
     const newVid: VideoItem = {
       id: `vid-${Date.now()}`,
       title: jobData.prompt.slice(0, 35) + '...',
@@ -129,27 +204,26 @@ export function App() {
       negativePrompt: jobData.negativePrompt,
       model: jobData.model,
       style: jobData.style,
-      duration: jobData.duration,
-      fps: jobData.fps,
-      aspectRatio: jobData.aspectRatio,
-      resolution: '4K',
       cameraMotion: jobData.cameraMotion,
+      videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+      thumbnailUrl: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=800&auto=format&fit=crop&q=80',
+      duration: jobData.duration,
+      aspectRatio: jobData.aspectRatio,
+      fps: jobData.fps,
       seed: jobData.seed,
-      videoUrl: MOCK_VIDEOS[Math.floor(Math.random() * MOCK_VIDEOS.length)].videoUrl,
-      thumbnailUrl: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1200&q=80',
-      tags: [jobData.style, '4K', jobData.aspectRatio],
-      createdAt: 'Just now',
+      resolution: '1080p',
+      tags: [jobData.style, 'GOOD YUTE', jobData.aspectRatio],
       likes: 1,
-      views: 12,
+      views: 1,
       creator: {
-        name: 'You (Creator)',
+        name: 'GOOD YUTE Creator',
         avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80'
-      }
+      },
+      createdAt: 'Just now'
     };
 
     setVideos((prev) => [newVid, ...prev]);
     setSelectedVideo(newVid);
-    showToast('🚀 Render job queued! Check Render Queue.');
   };
 
   const handleCancelJob = (id: string) => {
@@ -188,6 +262,7 @@ export function App() {
         setActiveTab={setActiveTab}
         activeQueueCount={renderJobs.filter((j) => j.status === 'processing').length}
         credits={credits}
+        totalSpent={totalSpent}
         onNewProject={() => {
           setActiveTab('studio');
           setActivePromptForStudio('');

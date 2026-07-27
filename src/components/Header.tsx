@@ -1,11 +1,12 @@
 import React from 'react';
-import { Video, Sparkles, Layers, Cpu, Plus, Compass, Key, Sun, Moon } from 'lucide-react';
+import { Video, Sparkles, Layers, Plus, Compass, Key, Sun, Moon, DollarSign } from 'lucide-react';
 
 interface HeaderProps {
   activeTab: 'studio' | 'queue' | 'gallery';
   setActiveTab: (tab: 'studio' | 'queue' | 'gallery') => void;
   activeQueueCount: number;
   credits: number;
+  totalSpent: number;
   onNewProject: () => void;
   onOpenSettings: () => void;
   hasApiKey: boolean;
@@ -18,12 +19,16 @@ export const Header: React.FC<HeaderProps> = ({
   setActiveTab,
   activeQueueCount,
   credits: _credits,
+  totalSpent,
   onNewProject,
   onOpenSettings,
   hasApiKey,
   theme,
   onToggleTheme
 }) => {
+  const initialCredit = 10.0;
+  const remainingEstimate = Math.max(0, initialCredit - totalSpent);
+
   return (
     <header style={{
       height: '64px',
@@ -56,14 +61,14 @@ export const Header: React.FC<HeaderProps> = ({
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <span style={{ fontWeight: 800, fontSize: '1.15rem', letterSpacing: '-0.03em', color: 'var(--text-primary)' }}>
-              AI Videos
+              GOOD YUTE
             </span>
             <span className="badge badge-indigo" style={{ fontSize: '0.65rem', padding: '2px 6px' }}>
-              v1.0 Pro
+              AI Design LAB
             </span>
           </div>
           <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-            Grungy Monochrome Cinema Studio
+            Next-Gen Neural Cinema Studio
           </span>
         </div>
       </div>
@@ -135,7 +140,7 @@ export const Header: React.FC<HeaderProps> = ({
         </button>
       </nav>
 
-      {/* Right Controls: Theme Switcher, API Settings & GPU Access */}
+      {/* Right Controls: Theme Switcher, API Settings & Live Spend Counter */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
         {/* Dark/Light Theme Toggle */}
         <button
@@ -161,6 +166,7 @@ export const Header: React.FC<HeaderProps> = ({
           {hasApiKey ? 'API Connected' : 'Connect API Key'}
         </button>
 
+        {/* Real USD Live Spend & Credit Tracker */}
         <div style={{
           display: 'flex',
           alignItems: 'center',
@@ -171,9 +177,12 @@ export const Header: React.FC<HeaderProps> = ({
           border: '1px solid var(--border-light)',
           fontSize: '0.82rem'
         }}>
-          <Cpu size={16} color="var(--text-primary)" />
-          <span style={{ color: 'var(--text-secondary)' }}>GPU Access:</span>
-          <span style={{ fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '0.5px' }}>∞ Unlimited</span>
+          <DollarSign size={15} color="var(--text-primary)" />
+          <span style={{ color: 'var(--text-secondary)' }}>Spent:</span>
+          <span style={{ fontWeight: 800, color: 'var(--text-primary)' }}>${totalSpent.toFixed(2)}</span>
+          <span style={{ color: 'var(--text-muted)', margin: '0 2px' }}>|</span>
+          <span style={{ color: 'var(--text-secondary)' }}>Credit:</span>
+          <span style={{ fontWeight: 800, color: '#34d399' }}>${remainingEstimate.toFixed(2)}</span>
         </div>
 
         <button className="btn btn-primary" onClick={onNewProject} style={{ padding: '8px 16px', fontSize: '0.85rem' }}>

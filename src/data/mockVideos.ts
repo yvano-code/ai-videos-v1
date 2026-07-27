@@ -183,10 +183,10 @@ export const CAMERA_MOTIONS = [
 ];
 
 export const AI_MODELS = [
-  { id: 'HunyuanVideo SOTA', name: 'Hunyuan SOTA', provider: 'Tencent Open-Source', speed: '12s (Fast)', quality: 'SOTA 1080p', cost: '~$0.05' },
-  { id: 'Wan2.1', name: 'Wan2.1', provider: 'Alibaba Open-Source', speed: '10s (Fast)', quality: 'Cinematic Motion', cost: '~$0.05' },
-  { id: 'Kling 1.5 Pro', name: 'Kling 1.5 Pro', provider: 'Kuaishou AI', speed: '15s', quality: 'Facial Emotion & Realism', cost: '~$0.12' },
-  { id: 'Luma Ray 2', name: 'Dream Machine', provider: 'Luma AI', speed: '18s', quality: 'Photoreal Physics', cost: '~$0.18' },
-  { id: 'LTX-Video', name: 'LTX-Video', provider: 'Lightricks Open-Source', speed: '4s (Ultra Fast)', quality: 'Budget Fast Draft', cost: '~$0.02' },
-  { id: 'Sora v2 Pro', name: 'Sora v2 Pro', provider: 'OpenAI', speed: '15s', quality: 'Ultra 8K Multi-Shot', cost: '~$0.20' },
+  { id: 'HunyuanVideo SOTA', name: 'Hunyuan SOTA', provider: 'Tencent Open-Source', endpoint: 'fal-ai/hunyuan-video', speed: '12s', quality: 'SOTA 1080p', cost: '$0.05 / vid', priceNum: 0.05 },
+  { id: 'Wan2.1', name: 'Wan2.1', provider: 'Alibaba Open-Source', endpoint: 'fal-ai/wan-2.1', speed: '10s', quality: 'Cinematic Motion', cost: '$0.05 / vid', priceNum: 0.05 },
+  { id: 'Kling 1.5 Pro', name: 'Kling 1.5 Pro', provider: 'Kuaishou AI', endpoint: 'fal-ai/kling-video/v1.5/standard', speed: '15s', quality: 'Facial Emotion', cost: '$0.12 / vid', priceNum: 0.12 },
+  { id: 'Luma Ray 2', name: 'Dream Machine', provider: 'Luma AI', endpoint: 'fal-ai/luma-dream-machine', speed: '18s', quality: 'Photoreal Physics', cost: '$0.18 / vid', priceNum: 0.18 },
+  { id: 'LTX-Video', name: 'LTX-Video', provider: 'Lightricks Open-Source', endpoint: 'fal-ai/ltx-video', speed: '4s (Ultra Fast)', quality: 'Budget Fast Draft', cost: '$0.015 / vid', priceNum: 0.015 },
+  { id: 'Sora v2 Pro', name: 'Sora v2 Pro', provider: 'OpenAI (Simulator)', endpoint: 'fal-ai/hunyuan-video', speed: '15s', quality: 'Ultra 8K Multi-Shot', cost: '$0.20 / vid', priceNum: 0.20 },
 ];

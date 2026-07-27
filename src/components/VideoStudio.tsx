@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Wand2,
   Sparkles,
@@ -6,9 +6,21 @@ import {
   RotateCcw,
   EyeOff,
   Image as ImageIcon,
-  Music
+  Music,
+  Upload,
+  FileVideo,
+  Volume2,
+  X,
+  Link
 } from 'lucide-react';
 import { AI_MODELS, STYLE_PRESETS, CAMERA_MOTIONS } from '../data/mockVideos';
+
+interface MediaAttachment {
+  name: string;
+  type: 'image' | 'video' | 'audio';
+  url: string;
+  size?: string;
+}
 
 interface VideoStudioProps {
   onGenerate: (jobData: {
@@ -45,11 +57,16 @@ export const VideoStudio: React.FC<VideoStudioProps> = ({
   const [fps, setFps] = useState<number>(30);
   const [seed, setSeed] = useState<number>(89432109);
 
-  // Enterprise features
+  // Enterprise features & Media Drag/Drop
   const [imageUrl, setImageUrl] = useState('');
-  const [showImageInput, setShowImageInput] = useState(false);
+  const [showImageInput, setShowImageInput] = useState(true);
   const [enableAudioSFX, setEnableAudioSFX] = useState(true);
   const [characterAnchor, setCharacterAnchor] = useState('');
+
+  // Drag & Drop Media state
+  const [mediaAttachment, setMediaAttachment] = useState<MediaAttachment | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (activePrompt) {
@@ -65,6 +82,43 @@ export const VideoStudio: React.FC<VideoStudioProps> = ({
     const enhancer = `, ${cameraObj?.label || 'dynamic motion'}, ${styleObj?.promptSuffix || 'cinematic lighting, photorealistic, 8k resolution'}`;
     if (!prompt.includes('cinematic')) {
       setPrompt((prev) => prev.trim() + enhancer);
+    }
+  };
+
+  const handleProcessFile = (file: File) => {
+    let mediaType: 'image' | 'video' | 'audio' = 'image';
+    if (file.type.startsWith('video/')) mediaType = 'video';
+    else if (file.type.startsWith('audio/')) mediaType = 'audio';
+
+    const objectUrl = URL.createObjectURL(file);
+    const sizeMb = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
+
+    setMediaAttachment({
+      name: file.name,
+      type: mediaType,
+      url: objectUrl,
+      size: sizeMb
+    });
+
+    if (mediaType === 'image') {
+      setImageUrl(objectUrl);
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleProcessFile(e.dataTransfer.files[0]);
     }
   };
 
@@ -353,12 +407,12 @@ export const VideoStudio: React.FC<VideoStudioProps> = ({
           </button>
         </div>
 
-        {/* Enterprise Pro Toggles */}
-        <div style={{ background: 'rgba(255, 255, 255, 0.02)', border: '1px solid var(--border-light)', borderRadius: 'var(--radius-md)', padding: '14px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        {/* Enterprise Pro Toggles & Drag/Drop Media Zone */}
+        <div style={{ background: 'rgba(120, 120, 120, 0.04)', border: '1px solid var(--border-light)', borderRadius: '12px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#a5b4fc', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <ImageIcon size={16} color="#818cf8" />
-              Image-to-Video Start Frame
+            <span style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Upload size={16} />
+              Input Media (Image / Video / Sound)
             </span>
             <button
               type="button"
@@ -366,19 +420,115 @@ export const VideoStudio: React.FC<VideoStudioProps> = ({
               onClick={() => setShowImageInput(!showImageInput)}
               style={{ padding: '4px 10px', fontSize: '0.75rem' }}
             >
-              {showImageInput ? 'Hide' : '+ Add Image URL'}
+              {showImageInput ? 'Hide Box' : 'Show Media Box'}
             </button>
           </div>
 
           {showImageInput && (
-            <input
-              type="text"
-              className="form-input"
-              value={imageUrl}
-              onChange={(e) => setImageUrl(e.target.value)}
-              placeholder="Paste starting keyframe image URL (e.g. https://...)"
-              style={{ fontSize: '0.82rem' }}
-            />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {/* Drag and Drop Zone */}
+              <div
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+                onClick={() => fileInputRef.current?.click()}
+                style={{
+                  border: isDragging ? '2px dashed var(--text-primary)' : '2px dashed var(--border-strong)',
+                  borderRadius: '10px',
+                  padding: '20px 16px',
+                  textAlign: 'center',
+                  background: isDragging ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.2)',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}
+              >
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*,video/*,audio/*"
+                  style={{ display: 'none' }}
+                  onChange={(e) => {
+                    if (e.target.files && e.target.files[0]) {
+                      handleProcessFile(e.target.files[0]);
+                    }
+                  }}
+                />
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <ImageIcon size={18} color="var(--text-secondary)" />
+                  <FileVideo size={18} color="var(--text-secondary)" />
+                  <Volume2 size={18} color="var(--text-secondary)" />
+                </div>
+
+                <div>
+                  <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+                    Drag & Drop Image, Video, or Audio file here
+                  </span>
+                  <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '2px' }}>
+                    or click to browse local files (.png, .jpg, .mp4, .mov, .mp3)
+                  </span>
+                </div>
+              </div>
+
+              {/* Active Media Preview Attachment Card */}
+              {mediaAttachment && (
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  background: 'var(--bg-glass-hover)',
+                  border: '1px solid var(--border-strong)',
+                  padding: '8px 12px',
+                  borderRadius: '8px',
+                  fontSize: '0.8rem'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', overflow: 'hidden' }}>
+                    {mediaAttachment.type === 'image' && (
+                      <img src={mediaAttachment.url} alt="Keyframe Preview" style={{ width: '36px', height: '36px', borderRadius: '6px', objectFit: 'cover' }} />
+                    )}
+                    {mediaAttachment.type === 'video' && <FileVideo size={20} color="var(--text-primary)" />}
+                    {mediaAttachment.type === 'audio' && <Volume2 size={20} color="var(--text-primary)" />}
+                    <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      <span style={{ fontWeight: 700, color: 'var(--text-primary)', display: 'block' }}>
+                        {mediaAttachment.name}
+                      </span>
+                      <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+                        {mediaAttachment.type.toUpperCase()} • {mediaAttachment.size || 'Local File'}
+                      </span>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={() => {
+                      setMediaAttachment(null);
+                      setImageUrl('');
+                    }}
+                    style={{ padding: '4px 8px' }}
+                  >
+                    <X size={14} />
+                  </button>
+                </div>
+              )}
+
+              {/* URL Input Fallback */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '2px' }}>
+                <Link size={14} color="var(--text-muted)" />
+                <input
+                  type="text"
+                  className="form-input"
+                  value={imageUrl}
+                  onChange={(e) => setImageUrl(e.target.value)}
+                  placeholder="Or paste starting keyframe media URL (e.g. https://...)"
+                  style={{ fontSize: '0.82rem', padding: '8px 12px' }}
+                />
+              </div>
+            </div>
           )}
 
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid var(--border-light)', paddingTop: '10px' }}>

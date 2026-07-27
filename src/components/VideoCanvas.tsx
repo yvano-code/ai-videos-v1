@@ -31,6 +31,7 @@ export const VideoCanvas: React.FC<VideoCanvasProps> = ({ video, onRemix }) => {
 
   useEffect(() => {
     if (videoRef.current) {
+      videoRef.current.load();
       videoRef.current.currentTime = 0;
       videoRef.current
         .play()
@@ -94,19 +95,29 @@ export const VideoCanvas: React.FC<VideoCanvasProps> = ({ video, onRemix }) => {
   };
 
   const handleExport = async () => {
+    const filename = `${video.title.toLowerCase().replace(/[^a-z0-9]/g, '-')}.mp4`;
     try {
-      const response = await fetch(video.videoUrl);
+      const response = await fetch(video.videoUrl, { mode: 'cors' });
+      if (!response.ok) throw new Error('CORS fetch fallback');
       const blob = await response.blob();
       const blobUrl = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = blobUrl;
-      link.download = `${video.title.toLowerCase().replace(/[^a-z0-9]/g, '-')}.mp4`;
+      link.download = filename;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      URL.revokeObjectURL(blobUrl);
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
     } catch {
-      window.open(video.videoUrl, '_blank');
+      // Direct browser download fallback
+      const link = document.createElement('a');
+      link.href = video.videoUrl;
+      link.download = filename;
+      link.target = '_blank';
+      link.setAttribute('rel', 'noopener noreferrer');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     }
   };
 

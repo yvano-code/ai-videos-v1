@@ -16,6 +16,18 @@ export function App() {
   const [activePromptForStudio, setActivePromptForStudio] = useState<string>('');
   const [apiKey, setApiKey] = useState<string>(() => localStorage.getItem('AI_VIDEO_API_KEY') || '');
   const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
+  const [theme, setTheme] = useState<'dark' | 'light'>(() => {
+    return (localStorage.getItem('theme') as 'dark' | 'light') || 'dark';
+  });
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
+  };
 
   // Queue of active render jobs
   const [renderJobs, setRenderJobs] = useState<RenderJob[]>([
@@ -182,6 +194,8 @@ export function App() {
         }}
         onOpenSettings={() => setIsSettingsOpen(true)}
         hasApiKey={!!apiKey}
+        theme={theme}
+        onToggleTheme={toggleTheme}
       />
 
       <ApiSettingsModal
